@@ -2,7 +2,7 @@ import React from 'react';
 import { Center, Heading, Wrap, Image,VStack } from '@chakra-ui/react';
 import UserCard from './components/UserCard';
 
-import usersPic from '../../assets/users.svg';
+//import usersPic from '../../assets/users.svg';
 import noUsersPic from '../../assets/no_users.svg';
 
 import { useMediaQuery } from '@react-hook/media-query';
