@@ -1,7 +1,7 @@
 import { HStack, Text, Button, useColorModeValue } from '@chakra-ui/react';
 import React from 'react';
 
-import useScrollProgress from '../../hooks/useScrollProgress';
+import useScrollProgress from '../hooks/useScrollProgress';
 
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

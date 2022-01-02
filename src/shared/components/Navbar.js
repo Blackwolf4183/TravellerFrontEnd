@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useColorMode } from '@chakra-ui/color-mode';
 import {
   Heading,
@@ -19,12 +19,18 @@ import {
 import { FaSun, FaMoon } from 'react-icons/fa';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCompass } from '@fortawesome/free-regular-svg-icons';
-import { faUser, faBars } from '@fortawesome/free-solid-svg-icons';
+import {
+  faUser,
+  faBars,
+  faSignOutAlt,
+} from '@fortawesome/free-solid-svg-icons';
 import { NavLink, useHistory } from 'react-router-dom';
-
+import { Authcontext } from '../context/auth-context';
 import { useMediaQuery } from '@react-hook/media-query';
 
 const Navbar = () => {
+  const auth = useContext(Authcontext);
+
   const history = useHistory();
 
   const { colorMode, toggleColorMode } = useColorMode();
@@ -33,8 +39,9 @@ const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = React.useRef();
 
-  const handleRedirect = () => {
-    console.log('redirect');
+  const logout = () => {
+    //function for loging someone out when is logged in
+    if (auth.isLoggedIn) auth.logout();
   };
 
   const navLinks = () => {
@@ -46,9 +53,17 @@ const Navbar = () => {
         <Heading fontSize="lg" lineHeight={'30px'}>
           <NavLink to="/users">Users</NavLink>
         </Heading>
-        <Heading fontSize="lg" lineHeight={'30px'}>
-          <NavLink to="/user/u1">Profile</NavLink>{/* TODO: change to dynamicly asign id when logged */}
-        </Heading>
+        {auth.isLoggedIn && (
+          <>
+            <Heading fontSize="lg" lineHeight={'30px'}>
+              <NavLink to="/user/u1">Profile</NavLink>
+              {/* TODO: change to dynamicly asign id when logged */}
+            </Heading>
+            <Heading fontSize="lg" lineHeight={'30px'}>
+              <NavLink to="/places/new">Add Place</NavLink>
+            </Heading>
+          </>
+        )}
       </HStack>
     );
   };
@@ -57,11 +72,7 @@ const Navbar = () => {
     return (
       <NavLink to="/">
         <IconButton textAlign={'center'}>
-          <FontAwesomeIcon
-            style={{ fontSize: '25px' }}
-            icon={faCompass}
-            onClick={handleRedirect}
-          />
+          <FontAwesomeIcon style={{ fontSize: '25px' }} icon={faCompass} />
         </IconButton>
       </NavLink>
     );
@@ -72,11 +83,7 @@ const Navbar = () => {
       <VStack mt="50px">
         {homeIcon()}
         <IconButton textAlign={'center'} ref={btnRef} onClick={onOpen}>
-          <FontAwesomeIcon
-            style={{ fontSize: '25px' }}
-            icon={faBars}
-            onClick={handleRedirect}
-          />
+          <FontAwesomeIcon style={{ fontSize: '25px' }} icon={faBars} />
         </IconButton>
       </VStack>
     );
@@ -118,16 +125,31 @@ const Navbar = () => {
               >
                 Users
               </Button>
-              <Button
+              {auth.isLoggedIn && (
+                <>
+                <Button
+                  w="90%"
+                  colorScheme={'orange'}
+                  onClick={() => {
+                    onClose();
+                    history.push('/Profile');
+                  }}
+                >
+                  Profile
+                </Button>
+
+                <Button
                 w="90%"
-                colorScheme={'orange'}
+                colorScheme={'purple'}
                 onClick={() => {
                   onClose();
-                  history.push('/Profile');
+                  history.push('/places/new');
                 }}
               >
-                Profile
+                Add Place
               </Button>
+              </>
+              )}
             </VStack>
           </DrawerBody>
         </DrawerContent>
@@ -161,13 +183,15 @@ const Navbar = () => {
               icon={colorMode === 'dark' ? <FaSun /> : <FaMoon />}
               onClick={toggleColorMode}
             ></IconButton>
-            <IconButton>
-              <FontAwesomeIcon
-                style={{ fontSize: '20px' }}
-                icon={faUser}
-                onClick={handleRedirect}
-              />
-            </IconButton>
+
+            <NavLink to="/auth">
+              <IconButton onClick={logout}>
+                <FontAwesomeIcon
+                  style={{ fontSize: '20px' }}
+                  icon={auth.isLoggedIn ? faSignOutAlt : faUser}
+                />
+              </IconButton>
+            </NavLink>
           </HStack>
         </HStack>
       </Center>

@@ -7,9 +7,10 @@ import {
   HStack,
   useDisclosure,
 } from '@chakra-ui/react';
-import React from 'react';
+import React, { useContext } from 'react';
 import { useMediaQuery } from '@react-hook/media-query';
 import { Link } from 'react-router-dom';
+import { Authcontext } from '../context/auth-context';
 
 import DeleteModal from './DeleteModal';
 
@@ -25,6 +26,7 @@ const PlaceCard = ({
 }) => {
   const isLowRes = useMediaQuery('(max-width:680px)');
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const auth = useContext(Authcontext);
 
   return (
     <>
@@ -68,7 +70,6 @@ const PlaceCard = ({
               {adress}
             </Box>
 
-            {/* TODO: display edit and delete only for owner user */}
             <HStack mt="2" as="h4" lineHeight="tight" isTruncated>
               <Button
                 colorScheme={'orange'}
@@ -79,6 +80,9 @@ const PlaceCard = ({
                 {isLowRes ? 'Map' : 'View on map'}
               </Button>
 
+              {/* TODO: display edit and delete only for owner user */}
+              {auth.isLoggedIn && 
+              <>
               <Link to={`places/${placeId}`}>
                 <Button colorScheme={'orange'} variant="outline" height="30px">
                   Edit
@@ -92,6 +96,9 @@ const PlaceCard = ({
               >
                 Delete
               </Button>
+              </>
+              }
+              
             </HStack>
           </Box>
         </Box>
