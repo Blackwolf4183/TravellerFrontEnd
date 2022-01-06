@@ -25,9 +25,8 @@ const PlacesList = ({ data }) => {
             key={place.id}
             placeId={place.id}
             title={place.title}
-            address={place.location}
             likes={place.likes}
-            picture={place.picture}
+            picture={place.image}
             city={place.city}
             country={place.country}
             creatorId={place.creatorId}

@@ -1,4 +1,8 @@
+import { useContext, useState } from 'react';
 import { Formik, Form, Field } from 'formik';
+import { useHistory } from 'react-router-dom';
+import { Authcontext } from '../shared/context/auth-context';
+import axios from 'axios';
 import {
   FormControl,
   FormLabel,
@@ -11,9 +15,13 @@ import {
   Textarea,
   HStack,
   Button,
+  Text,
 } from '@chakra-ui/react';
 
 const NewPlace = () => {
+  const auth = useContext(Authcontext);
+  const history = useHistory();
+
   function validateTitle(value) {
     let error;
     if (!value) {
@@ -32,6 +40,22 @@ const NewPlace = () => {
     return error;
   }
 
+  function validateCountry(value) {
+    let error;
+    if (!value) {
+      error = ' " " is not a contry >:( ';
+    }
+    return error;
+  }
+
+  function validateCity(value) {
+    let error;
+    if (!value) {
+      error = 'Maybe in a future, but for now try an actual city';
+    }
+    return error;
+  }
+
   //to validate:
   // should start with either https://goo.gl/maps/
   // or https://www.google.es/maps/place/
@@ -40,27 +64,56 @@ const NewPlace = () => {
     let error;
 
     if (!url) {
-      error = 'We won\'t figure out this place with magic';
-    } else if (!url.startsWith("https://www.google.es/maps/place/") && !url.startsWith("https://goo.gl/maps/")) {
-      error = "That doesn't seem like a valid google maps url, try using the share button on the location";
+      error = "We won't figure out this place with magic";
+    } else if (
+      !url.startsWith('https://www.google.es/maps/place/') &&
+      !url.startsWith('https://goo.gl/maps/')
+    ) {
+      error =
+        "That doesn't seem like a valid google maps url, try using the share button on the location";
     }
     return error;
   }
 
+  const [error, setError] = useState(null);
+
   return (
     <Formik
-      initialValues={{ title: '', description: '',mapsUrl:'' }}
+      initialValues={{
+        title: '',
+        description: '',
+        country: '',
+        city: '',
+        mapsUrl: '',
+      }}
       onSubmit={(values, actions) => {
         setTimeout(() => {
-          alert(JSON.stringify(values, null, 2));
-          actions.setSubmitting(false); //TODO: send data to server
+          //post request
+          axios
+            .post('http://localhost:5000/api/places/', {
+              title: values.title,
+              description: values.description,
+              country: values.country,
+              city: values.city,
+              mapsUrl: values.mapsUrl,
+              creatorId: auth.userId,
+            })
+            .then(response => {
+              actions.setSubmitting(false);
+              /* console.log(response.data); */
+              history.push('/user/' + auth.userId);
+            })
+            .catch(error => {
+              actions.setSubmitting(false);
+              setError(error.response.data.message);
+            });
         }, 1000);
       }}
     >
       {props => (
         <Form>
           <Center mt="50px">
-            <VStack spacing="30px" w="80%" maxWidth="1000px">
+            <VStack spacing="30px" w="80%" mb="150px" maxWidth="1000px">
               <Heading mt="10px">Create your place</Heading>
 
               <Field name="title" validate={validateTitle}>
@@ -74,6 +127,7 @@ const NewPlace = () => {
                       id="title"
                       placeholder="A long time ago in a galaxy far, far away.."
                       fontSize="md"
+                      maxLength={50}
                     />
                     <FormHelperText>
                       Some meaningful title for your experience.
@@ -94,41 +148,108 @@ const NewPlace = () => {
                     <Textarea
                       {...field}
                       id="description"
-                      placeholder="Don't be shy you've got over 150 words to express yourself."
+                      placeholder="Don't be shy you've got over 300 characters to express yourself."
+                      maxLength={350}
                       fontSize="md"
-                      resize={"none"}
+                      resize={'none'}
                     />
                     <FormHelperText>
-                      Maybe tell the people what you liked the most, or even things you found interesting...
+                      Maybe tell the people what you liked the most, or even
+                      things you found interesting...
                     </FormHelperText>
-                    <FormErrorMessage>{form.errors.description}</FormErrorMessage>
+                    <FormErrorMessage>
+                      {form.errors.description}
+                    </FormErrorMessage>
                   </FormControl>
                 )}
               </Field>
 
-                {/* maps url */}
+              {/* country and city */}
+              <HStack w="100%">
+                <Field name="country" validate={validateCountry}>
+                  {({ field, form }) => (
+                    <FormControl
+                      isInvalid={form.errors.country && form.touched.country}
+                    >
+                      <FormLabel htmlFor="country">Country name </FormLabel>
+                      <Input
+                        {...field}
+                        id="country"
+                        placeholder="Maybe USA, Russia, Nigeria..."
+                        fontSize="md"
+                        maxLength={20}
+                      />
+                      <FormHelperText>
+                        Over 190 countries to choose from!
+                      </FormHelperText>
+                      <FormErrorMessage>{form.errors.country}</FormErrorMessage>
+                    </FormControl>
+                  )}
+                </Field>
+
+                <Field name="city" validate={validateCity}>
+                  {({ field, form }) => (
+                    <FormControl
+                      isInvalid={form.errors.city && form.touched.city}
+                    >
+                      <FormLabel htmlFor="city">
+                        City / State / Town...{' '}
+                      </FormLabel>
+                      <Input
+                        {...field}
+                        id="city"
+                        placeholder="Just to be a little more specific"
+                        fontSize="md"
+                        maxLength={30}
+                      />
+                      <FormHelperText>
+                        A few more cities even than countries
+                      </FormHelperText>
+                      <FormErrorMessage>{form.errors.city}</FormErrorMessage>
+                    </FormControl>
+                  )}
+                </Field>
+              </HStack>
+              {/* maps url */}
               <Field name="mapsUrl" validate={validateMapsUrl}>
                 {({ field, form }) => (
                   <FormControl
-                    isInvalid={
-                      form.errors.mapsUrl && form.touched.mapsUrl
-                    }
+                    isInvalid={form.errors.mapsUrl && form.touched.mapsUrl}
                   >
-                    <FormLabel htmlFor="mapsUrl">Location from Google Maps</FormLabel>
+                    <FormLabel htmlFor="mapsUrl">
+                      Location from Google Maps
+                    </FormLabel>
                     <Input
                       {...field}
                       id="mapsUrl"
                       placeholder="Probably should look into adding an embedded map."
                       fontSize="md"
-                      resize={"none"}
+                      resize={'none'}
+                      maxLength={500}
                     />
                     <FormHelperText>
-                      Find the location through <b><a href="https://www.google.es/maps/" target="_blank" rel="noopener noreferrer">here</a></b>.
+                      Find the location through{' '}
+                      <b>
+                        <a
+                          href="https://www.google.es/maps/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          here
+                        </a>
+                      </b>
+                      .
                     </FormHelperText>
                     <FormErrorMessage>{form.errors.mapsUrl}</FormErrorMessage>
                   </FormControl>
                 )}
-              </Field>   
+              </Field>
+
+              {error && (
+                <HStack w="100%">
+                  <Text color="red.300">{error}</Text>
+                </HStack>
+              )}
 
               <HStack w="100%">
                 <Button
@@ -149,4 +270,3 @@ const NewPlace = () => {
 };
 
 export default NewPlace;
-

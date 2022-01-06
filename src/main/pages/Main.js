@@ -8,18 +8,19 @@ import {
   Button,
   Text,
 } from '@chakra-ui/react';
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { NavLink,Link } from 'react-router-dom';
 import { useMediaQuery } from '@react-hook/media-query';
+import axios from 'axios';
 
 import presentation2 from '../../assets/presentation2.svg';
 import PlacesList from '../../shared/components/PlacesList';
+import LoadingSpinner from '../../shared/components/LoadingSpinner'
 
 const dummyPlaces = [
     {
         id:"p1",
-        picture:"https://images.unsplash.com/photo-1552832230-c0197dd311b5?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cm9tZXxlbnwwfHwwfHw%3D&w=1000&q=80",
-        adress:"Piazza del Colosseo, 1, 00184 Roma RM, Italia",
+        image:"https://images.unsplash.com/photo-1552832230-c0197dd311b5?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cm9tZXxlbnwwfHwwfHw%3D&w=1000&q=80",
         likes:12,
         title:"Roman coliseum",
         city:"Rome",
@@ -32,6 +33,24 @@ const dummyPlaces = [
 ]
 
 const Main = () => {
+
+  //places fetching
+  const [places, setPlaces] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    axios
+      .get('http://localhost:5000/api/main/' )
+      .then(response => {
+        setPlaces(response.data.places);
+        setIsLoading(false);
+      })
+      .catch(error => {
+        setError(error.message);
+      });
+  }, [])
+
   const isLowRes = useMediaQuery('(max-width:680px)');
 
   return (
@@ -58,7 +77,7 @@ const Main = () => {
       </VStack>
       <Divider w="60%" />
       <Heading size="lg">Most Recent Shares</Heading>
-      <PlacesList data={dummyPlaces}/>
+      {isLoading ? <LoadingSpinner msg="Loading places..."/> : (error ? <Text color="red.300">{error}</Text> : <PlacesList data={places}/>)}
     </VStack>
   );
 };

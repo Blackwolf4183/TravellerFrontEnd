@@ -5,7 +5,6 @@ import {
   useColorModeValue,
   WrapItem,
   Text,
-  Heading,
   VStack,
   Center,
 } from '@chakra-ui/react';
@@ -18,7 +17,7 @@ import { motion } from 'framer-motion';
 
 const MotionBox = motion(Box);
 
-const UserCard = ({id, name, pic, likes, numPlaces }) => {
+const UserCard = ({ id, name, image, likes, numPlaces }) => {
   const cardColor = useColorModeValue('primaryLight', 'primary');
 
   return (
@@ -26,50 +25,65 @@ const UserCard = ({id, name, pic, likes, numPlaces }) => {
       <MotionBox
         h="175px"
         w="200px"
-        borderRadius={'10px'}
+        borderRadius={'md'}
         bgColor={cardColor}
         textAlign={'center'}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         p="10px"
+        mt="10px"
       >
         <Link to={`user/${id}`}>
-        <Avatar
-          src={pic}
-          size="xl"
-          borderColor={cardColor}
-          borderWidth={'5px'}
-          userSelect={'none'}
-          mt="-50px"
-        />
+          <Avatar
+            src={image}
+            size="xl"
+            borderColor={cardColor}
+            borderWidth={'5px'}
+            userSelect={'none'}
+            mt="-50px"
+          />
 
-        <Heading size="md" userSelect={'none'} m="5px 10px 0 10px">
-          {name ? name : 'Not found'}
-        </Heading>
+          <Text fontSize="lg" userSelect={'none'} m="0px 10px 0 10px">
+            {name
+              ? name.length > 10
+                ? name.substring(0, 8) + '...'
+                : name
+              : 'Not found'}
+          </Text>
 
-        <Center>
-          <VStack w="250px" mt="10px">
-            <Box w="100px">
-              <FontAwesomeIcon
-                style={{ fontSize: '25px', color: '#ff4d4d' }}
-                icon={faHeart}
-              ></FontAwesomeIcon>
-              <Text fontSize={'xl'} userSelect={"none"} display="inline-block" ml="5px">
-                {likes ? likes : 0}
-              </Text>
-            </Box>
+          <Center>
+            <VStack w="250px" mt="10px">
+              <Box w="100px">
+                <FontAwesomeIcon
+                  style={{ fontSize: '25px', color: '#ff4d4d' }}
+                  icon={faHeart}
+                ></FontAwesomeIcon>
+                <Text
+                  fontSize={'xl'}
+                  userSelect={'none'}
+                  display="inline-block"
+                  ml="5px"
+                >
+                  {likes ? likes : 0}
+                </Text>
+              </Box>
 
-            <Box w="100px">
-              <FontAwesomeIcon
-                style={{ fontSize: '25px', color: '#82d1c6' }}
-                icon={faThumbtack}
-              ></FontAwesomeIcon>
-              <Text fontSize={'xl'} userSelect={"none"} display="inline-block" ml="5px">
-                {numPlaces ? numPlaces : 0}
-              </Text>
-            </Box>
-          </VStack>
-        </Center>
+              <Box w="100px">
+                <FontAwesomeIcon
+                  style={{ fontSize: '25px', color: '#82d1c6' }}
+                  icon={faThumbtack}
+                ></FontAwesomeIcon>
+                <Text
+                  fontSize={'xl'}
+                  userSelect={'none'}
+                  display="inline-block"
+                  ml="5px"
+                >
+                  {numPlaces ? numPlaces : 0}
+                </Text>
+              </Box>
+            </VStack>
+          </Center>
         </Link>
       </MotionBox>
     </WrapItem>

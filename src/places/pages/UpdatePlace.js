@@ -1,3 +1,4 @@
+import { useState, useEffect, useContext } from 'react';
 import { Formik, Form, Field } from 'formik';
 import {
   FormControl,
@@ -15,26 +16,13 @@ import {
   Box,
   Text,
 } from '@chakra-ui/react';
-import { useParams } from 'react-router-dom/cjs/react-router-dom.min';
+import { useParams,useHistory } from 'react-router-dom/cjs/react-router-dom.min';
+import axios from 'axios';
+import notFound from '../../assets/not_found.svg';
+import LoadingSpinner from '../../shared/components/LoadingSpinner';
+import { Authcontext } from '../../shared/context/auth-context';
 
-import notFound from '../../assets/not_found.svg'
 
-//TODO: REMOVE
-const dummyPlaces = [
-  {
-    id: 'p1',
-    picture:
-      'https://images.unsplash.com/photo-1552832230-c0197dd311b5?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cm9tZXxlbnwwfHwwfHw%3D&w=1000&q=80',
-    adress: 'Piazza del Colosseo, 1, 00184 Roma RM, Italia',
-    likes: 12,
-    title: 'Roman coliseum',
-    city: 'Rome',
-    country: 'Italy',
-    description:"Just a plain old regular colisseum",
-    creatorId: 'u1',
-    mapsUrl: 'https://goo.gl/maps/BXABiiaUEDd2cZmg6',
-  },
-];
 
 const UpdatePlace = () => {
   function validateTitle(value) {
@@ -55,42 +43,96 @@ const UpdatePlace = () => {
     return error;
   }
 
+  //place fetching
+  const auth = useContext(Authcontext);
+  const history = useHistory();
   const placeId = useParams().placeId;
-  const identifiedPlace = dummyPlaces.find(p => p.id === placeId);
+  const [identifiedPlace, setIdentifiedPlace] = useState(null);
+  const [placeError, setPlaceError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [updateError,setUpdateError] = useState(null);
 
-  if (!identifiedPlace) {
+  //TODO: check if place to update, actually belongs to user/*  */
+
+  useEffect(() => {
+    //user places fetching
+    axios
+      .get('http://localhost:5000/api/places/' + placeId)
+      .then(response => {
+        setIdentifiedPlace(response.data.place);
+        setIsLoading(false);
+        if(identifiedPlace && response.data.place.creatorId !== auth.userId){ //to prevent another user to update place 
+          history.push("/");
+        }
+      })
+      .catch(error => {
+        setPlaceError(error.message);
+      });
+
+      
+
+  }, [placeId]);
+
+  if (!identifiedPlace || placeError) {
     return (
-      <Center mt="100px" textAlign={"center"}>
-          <Box w="50%" borderRadius={"md"} borderWidth={"2px"} p="20px">
-        <Image userSelect={'none'} src={notFound} />
-        <Heading mt="50px">Doesn't seem like a valid place. Try again!</Heading>
+      <Center mt="100px" textAlign={'center'} textAlign="center">
+        <Box w="50%" borderRadius={'md'} borderWidth={'2px'} p="20px">
+          <Center>
+            <Image
+              userSelect={'none'}
+              src={notFound}
+              maxWidth={'700px'}
+              w="90%"
+            />
+          </Center>
+          <Heading mt="50px">
+            {placeError ? placeError : 'Could not find the place. Try again!'}
+          </Heading>
         </Box>
       </Center>
     );
+  }else if(isLoading){
+    return <LoadingSpinner msg="Loading place update..."/>
   }
 
   return (
     <Formik
-      initialValues={{ title: identifiedPlace.title, description: identifiedPlace.description}}
+      initialValues={{
+        title: identifiedPlace.title,
+        description: identifiedPlace.description,
+      }}
       onSubmit={(values, actions) => {
         setTimeout(() => {
-          alert(JSON.stringify(values, null, 2));
-          actions.setSubmitting(false); //TODO: send data to server
+          axios
+            .patch('http://localhost:5000/api/places/' + placeId, {
+              title: values.title,
+              description: values.description,
+            })
+            .then(response => {
+              actions.setSubmitting(false);
+              history.push('/user/' + auth.userId);
+            })
+            .catch(error => {
+              actions.setSubmitting(false);
+              setUpdateError(error.response.data.message);
+            });
         }, 1000);
       }}
     >
       {props => (
         <Form>
           <Center mt="50px">
-            <VStack spacing="30px" w="80%" maxWidth="1000px">
+            <VStack spacing="30px" w="80%" mb="150px" maxWidth="1000px">
               <Heading mt="10px">Update your place</Heading>
-              <Text size="sm">Everybody makes mistakes from time to time...</Text>
+              <Text size="sm">
+                Everybody makes mistakes from time to time...
+              </Text>
               <Field name="title" validate={validateTitle}>
                 {({ field, form }) => (
                   <FormControl
                     isInvalid={form.errors.title && form.touched.title}
                   >
-                    <FormLabel htmlFor="title">Give it a title</FormLabel>
+                    <FormLabel htmlFor="title">New title</FormLabel>
                     <Input
                       {...field}
                       id="title"
@@ -98,7 +140,7 @@ const UpdatePlace = () => {
                       fontSize="md"
                     />
                     <FormHelperText>
-                      Some meaningful title for your experience.
+                      Everybody makes mistakes, here is your place to mend some of them.
                     </FormHelperText>
                     <FormErrorMessage>{form.errors.title}</FormErrorMessage>
                   </FormControl>
@@ -112,7 +154,7 @@ const UpdatePlace = () => {
                       form.errors.description && form.touched.description
                     }
                   >
-                    <FormLabel htmlFor="title">A brief description</FormLabel>
+                    <FormLabel htmlFor="title">New description</FormLabel>
                     <Textarea
                       {...field}
                       id="description"
@@ -130,7 +172,11 @@ const UpdatePlace = () => {
                   </FormControl>
                 )}
               </Field>
-
+              {updateError && (
+                <HStack w="100%">
+                  <Text color="red.300">{updateError}</Text>
+                </HStack>
+              )}
               <HStack w="100%">
                 <Button
                   mt={4}

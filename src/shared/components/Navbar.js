@@ -56,8 +56,7 @@ const Navbar = () => {
         {auth.isLoggedIn && (
           <>
             <Heading fontSize="lg" lineHeight={'30px'}>
-              <NavLink to="/user/u1">Profile</NavLink>
-              {/* TODO: change to dynamicly asign id when logged */}
+              <NavLink to={"/user/" + auth.userId}>Profile</NavLink>
             </Heading>
             <Heading fontSize="lg" lineHeight={'30px'}>
               <NavLink to="/places/new">Add Place</NavLink>
@@ -132,7 +131,7 @@ const Navbar = () => {
                   colorScheme={'orange'}
                   onClick={() => {
                     onClose();
-                    history.push('/Profile');
+                    history.push("/user/" + auth.userId);
                   }}
                 >
                   Profile

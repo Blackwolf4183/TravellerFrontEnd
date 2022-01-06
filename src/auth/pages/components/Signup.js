@@ -1,5 +1,6 @@
 import { useState,useContext } from 'react';
 import { Formik, Form, Field } from 'formik';
+import axios from 'axios';
 import {
   FormControl,
   FormLabel,
@@ -24,6 +25,8 @@ const Signup = ({ setIsLoging }) => {
     let error;
     if (!value) {
       error = 'Please enter a valid username';
+    }else if(value.trim().length>15){
+      error = 'Username too long please enter a shorter one';
     }
     return error;
   }
@@ -51,14 +54,32 @@ const Signup = ({ setIsLoging }) => {
   const [show, setShow] = useState(false);
   const handleClick = () => setShow(!show);
 
+  const [errorMsg, setErrorMsg] = useState(null);
+
   return (
     <Formik
       initialValues={{ mail: '', password: '', username: '' }}
       onSubmit={(values, actions) => {
         setTimeout(() => {
-          alert(JSON.stringify(values, null, 2));
-          actions.setSubmitting(false); //TODO: validate user
-          auth.login();
+          const {mail, password, username} = values;
+
+          axios.post("http://localhost:5000/api/users/signup/",{
+            name:username,
+            email:mail,
+            password:password,
+          })
+          .then((response) => {
+              const responseData = response.data
+              actions.setSubmitting(false); 
+              auth.login(responseData.user.id);
+          })
+          .catch(error => {
+            actions.setSubmitting(false);
+            if (error.response.data) {
+              setErrorMsg(error.response.data.message);
+            }
+          })
+          
         }, 1000);
       }}
     >
@@ -73,11 +94,11 @@ const Signup = ({ setIsLoging }) => {
                   <FormControl
                     isInvalid={form.errors.username && form.touched.username}
                   >
-                    <FormLabel htmlFor="title">Username</FormLabel>
+                    <FormLabel htmlFor="username">Username</FormLabel>
                     <Input
                       {...field}
                       id="username"
-                      placeholder="youremail@gmail.com"
+                      placeholder="Xx_Destroyer_of_Worlds_xX"
                       fontSize="md"
                       variant="flushed"
                     />
@@ -91,7 +112,7 @@ const Signup = ({ setIsLoging }) => {
                   <FormControl
                     isInvalid={form.errors.mail && form.touched.mail}
                   >
-                    <FormLabel htmlFor="title">Email</FormLabel>
+                    <FormLabel htmlFor="mail">Email</FormLabel>
                     <Input
                       {...field}
                       id="mail"
@@ -128,8 +149,12 @@ const Signup = ({ setIsLoging }) => {
                   </FormControl>
                 )}
               </Field>
-
-              <HStack w="100%">
+              <>
+              { errorMsg &&
+              <HStack w="100%" color={"red.300"}>
+                  <Text h="0">{errorMsg}</Text>
+                </HStack>}
+              <HStack w="100%"> 
                 <Button
                   mt={2}
                   mb={10}
@@ -149,6 +174,7 @@ const Signup = ({ setIsLoging }) => {
                   Already have an account?
                 </Text>
               </HStack>
+              </>
             </VStack>
           </Center>
         </Form>

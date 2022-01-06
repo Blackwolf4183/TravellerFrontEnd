@@ -1,5 +1,6 @@
-import { useState,useContext } from 'react';
+import { useState, useContext } from 'react';
 import { Formik, Form, Field } from 'formik';
+import axios from 'axios';
 import {
   FormControl,
   FormLabel,
@@ -16,8 +17,7 @@ import {
 } from '@chakra-ui/react';
 import { Authcontext } from '../../../shared/context/auth-context';
 
-const Login = ({setIsLoging}) => {
-
+const Login = ({ setIsLoging }) => {
   const auth = useContext(Authcontext);
 
   function emailValidator(value) {
@@ -36,17 +36,35 @@ const Login = ({setIsLoging}) => {
     return error;
   }
 
-  const [show, setShow] = useState(false)
-  const handleClick = () => setShow(!show)
+  const [show, setShow] = useState(false);
+  const handleClick = () => setShow(!show);
+
+  const [errorMsg, setErrorMsg] = useState(null);
 
   return (
     <Formik
       initialValues={{ mail: '', password: '' }}
       onSubmit={(values, actions) => {
         setTimeout(() => {
-          alert(JSON.stringify(values, null, 2));
-          actions.setSubmitting(false); //TODO: validate user
-          auth.login();
+          const { mail, password } = values;
+
+          axios
+            .post('http://localhost:5000/api/users/login/', {
+              email: mail,
+              password: password,
+            })
+            .then(response => {
+              /* console.log(response.data); */
+              const responseData = response.data
+              actions.setSubmitting(false);
+              auth.login(responseData.user.id);
+            })
+            .catch(error => {
+              actions.setSubmitting(false);
+              if (error.response) {
+                setErrorMsg(error.response.data.message);
+              }
+            });
         }, 1000);
       }}
     >
@@ -98,21 +116,33 @@ const Login = ({setIsLoging}) => {
                   </FormControl>
                 )}
               </Field>
-
-              <HStack w="100%">
-                <Button
-                  mt={2}
-                  mb={10}
-                  colorScheme="orange"
-                  isLoading={props.isSubmitting}
-                  type="submit"
-                >
-                  Log in
-                </Button>
-                <Text pb="15px" cursor={'pointer'} onClick={ () => {setIsLoging(false)}}>
-                  Don't have an account?
-                </Text>
-              </HStack>
+              <>
+                {errorMsg && (
+                  <HStack w="100%" color={'red.300'}>
+                    <Text h="0">{errorMsg}</Text>
+                  </HStack>
+                )}
+                <HStack w="100%">
+                  <Button
+                    mt={2}
+                    mb={10}
+                    colorScheme="orange"
+                    isLoading={props.isSubmitting}
+                    type="submit"
+                  >
+                    Log in
+                  </Button>
+                  <Text
+                    pb="15px"
+                    cursor={'pointer'}
+                    onClick={() => {
+                      setIsLoging(false);
+                    }}
+                  >
+                    Don't have an account?
+                  </Text>
+                </HStack>
+              </>
             </VStack>
           </Center>
         </Form>

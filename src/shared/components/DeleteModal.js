@@ -8,16 +8,20 @@ import {
   ModalBody,
   ModalCloseButton,
   Button,
-  Text
+  Text,
 } from '@chakra-ui/react';
+import axios from 'axios';
 
-
-const DeleteModal = ({ isOpen, onClose}) => {
-
-    const handleDelete = () => {
-        onClose();
-        //TODO: enviar request de delete al servidor
-    }
+const DeleteModal = ({ isOpen, onClose, placeId }) => {
+  const handleDelete = () => {
+    onClose();
+    axios.delete('http://localhost:5000/api/places/' + placeId).then(response => {
+      /* console.log(response) */
+      window.location.reload(); //to update page
+    }).catch(error => {
+      console.log(error);
+    })
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">
