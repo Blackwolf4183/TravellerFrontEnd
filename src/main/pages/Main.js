@@ -7,24 +7,34 @@ import {
   Divider,
   Button,
   Text,
+  IconButton
 } from '@chakra-ui/react';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { useMediaQuery } from '@react-hook/media-query';
+import { Authcontext } from '../../shared/context/auth-context';
 import axios from 'axios';
 
 import presentation2 from '../../assets/presentation2.svg';
 import PlacesList from '../../shared/components/PlacesList';
 import LoadingSpinner from '../../shared/components/LoadingSpinner';
 
-import { faThumbtack } from '@fortawesome/free-solid-svg-icons';
+import { faThumbtack,faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const Main = () => {
+
+  const logout = () => {
+    //function for loging someone out when is logged in
+    if (auth.isLoggedIn) auth.logout();
+  };
+
   //places fetching
   const [places, setPlaces] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const auth = useContext(Authcontext);
 
   useEffect(() => {
     axios
@@ -55,20 +65,31 @@ const Main = () => {
       </Box>
 
       <VStack spacing={'10px'}>
-        <Link to="/auth">
-          <Button colorScheme={'orange'} w="125px">
-            Sign in!
-          </Button>
+        <Link to="/auth/signup">
+          {auth.isLoggedIn ? (
+            <IconButton onClick={logout} colorScheme={"orange"} size="lg">
+              <FontAwesomeIcon
+                style={{ fontSize: '25px' }}
+                icon={faSignOutAlt}
+              />
+            </IconButton>
+          ) : (
+            <Button colorScheme={'orange'} w="125px">
+              Sign in!
+            </Button>
+          )}
         </Link>
-        <NavLink to="/auth">
-          <Text fontSize={['sm', 'lg']}>Already have an account?</Text>
+        <NavLink to="/auth/login">
+          <Text fontSize={['sm', 'lg']}>
+            {auth.isLoggedIn ? 'Switch account' : 'Already have an account?'}
+          </Text>
         </NavLink>
       </VStack>
       <Divider w="60%" />
       <Heading size="lg">
         Most Recent Shares
         <FontAwesomeIcon
-          style={{ fontSize: '25px', color: '#82d1c6',marginLeft:"10px" }}
+          style={{ fontSize: '25px', color: '#82d1c6', marginLeft: '10px' }}
           icon={faThumbtack}
         ></FontAwesomeIcon>
       </Heading>

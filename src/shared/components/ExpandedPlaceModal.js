@@ -60,7 +60,7 @@ const ExpandedPlaceModal = ({
         <ModalHeader mt={2}>{title.toUpperCase()}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Image src={picture} borderRadius={'md'} />
+          <Image draggable="false" src={picture} borderRadius={'md'} />
 
           <HStack mt={8} spacing="10px" mb={4}>
             {isLoading ? (
@@ -98,7 +98,7 @@ const ExpandedPlaceModal = ({
               <Badge colorScheme={'purple'}>{country}</Badge>
             </Text>
             <Text fontSize="lg" mt={2}>
-              Description:
+              Description
             </Text>
             <Text mt={1}>{description}</Text>
           </Box>

@@ -1,4 +1,5 @@
 import { useState,useContext } from 'react';
+import { useHistory } from 'react-router-dom';
 import { Formik, Form, Field } from 'formik';
 import axios from 'axios';
 import {
@@ -17,9 +18,10 @@ import {
 } from '@chakra-ui/react';
 import { Authcontext } from '../../../shared/context/auth-context';
 
-const Signup = ({ setIsLoging }) => {
+const Signup = () => {
 
   const auth = useContext(Authcontext);
+  const history = useHistory();
 
   function usernameValidator(value) {
     let error;
@@ -168,7 +170,7 @@ const Signup = ({ setIsLoging }) => {
                   pb="15px"
                   cursor={'pointer'}
                   onClick={() => {
-                    setIsLoging(true);
+                    history.push("/auth/login")
                   }}
                 >
                   Already have an account?

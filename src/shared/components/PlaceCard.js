@@ -37,17 +37,25 @@ const PlaceCard = ({
   creatorId,
 }) => {
   const isLowRes = useMediaQuery('(max-width:680px)');
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const expandedPlaceDisclosure = useDisclosure();
+  const {
+    isOpen:isOpenDeleteModal,
+    onOpen:openDeleteModal,
+    onClose:closeDeleteModal,
+  } = useDisclosure();
+  const {
+    isOpen:isOpenExtendedModal,
+    onOpen:openExtendedModal,
+    onClose:closeExtendedModal,
+  } = useDisclosure();
   const auth = useContext(Authcontext);
   const history = useHistory();
 
   return (
     <>
-      <DeleteModal isOpen={isOpen} onClose={onClose} placeId={placeId} />
+      <DeleteModal isOpen={isOpenDeleteModal} onClose={closeDeleteModal} placeId={placeId} />
       <ExpandedPlaceModal
-        isOpen={expandedPlaceDisclosure.isOpen}
-        onClose={expandedPlaceDisclosure.onClose}
+        isOpen={isOpenExtendedModal}
+        onClose={closeExtendedModal}
         picture={picture ? picture : imgPlaceHolder}
         likes={likes}
         title={title}
@@ -64,9 +72,9 @@ const PlaceCard = ({
           overflow="hidden"
           whileHover={{ scale: 0.95 }}
           whileTap={{ scale: 1 }}
-          onClick={expandedPlaceDisclosure.onOpen}
         >
-          <Image src={picture ? picture : imgPlaceHolder} />
+
+          <Image onClick={openExtendedModal} draggable="false" src={picture ? picture : imgPlaceHolder} />
 
           <Box p="6">
             <Box display="flex" alignItems="baseline">
@@ -83,8 +91,8 @@ const PlaceCard = ({
               >
                 {city} &bull; {country}
               </Box>
-            </Box>
 
+            </Box>
             <Box
               mt="1"
               fontWeight="semibold"
@@ -138,7 +146,8 @@ const PlaceCard = ({
                     colorScheme={'red'}
                     height="30px"
                     variant="outline"
-                    onClick={onOpen}
+                    onClick={openDeleteModal}
+                    zIndex={5}
                   >
                     Delete
                   </Button>

@@ -9,12 +9,11 @@ import {
   Box,
   Divider,
   Button,
-  useColorModeValue,
   Center,
   Image,
 } from '@chakra-ui/react';
 import { useMediaQuery } from '@react-hook/media-query';
-import { faMapMarker } from '@fortawesome/free-solid-svg-icons';
+import { faThumbtack, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Authcontext } from '../../shared/context/auth-context';
 import { Link } from 'react-router-dom';
@@ -29,7 +28,6 @@ import noUsersPic from '../../assets/no_users.svg';
 //TODO: load everything and filter or just load specific?
 
 const User = () => {
-  const mainColor = useColorModeValue('primaryLight', 'primary');
   const isLowRes = useMediaQuery('(max-width:680px)');
 
   const auth = useContext(Authcontext);
@@ -39,18 +37,6 @@ const User = () => {
   const [errorMsg, setErrorMsg] = useState(null);
   const [userPlaces, setUserPlaces] = useState(null);
   const [userPlacesError, setUserPlacesError] = useState(null);
-
-  const getYearPercentage = () => {
-    var now = new Date();
-    var start = new Date(now.getFullYear(), 0, 0);
-    var diff =
-      now -
-      start +
-      (start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000;
-    var oneDay = 1000 * 60 * 60 * 24;
-    var day = Math.floor(diff / oneDay);
-    return (day / 365) * 100;
-  };
 
   useEffect(() => {
     //user data fetching
@@ -101,9 +87,21 @@ const User = () => {
     <VStack justify={'center'} mt="50px" spacing="50px" mb="100px">
       <HStack spacing="50px" w={isLowRes ? '80%' : '60%'}>
         <Avatar size="xl" src={userData.image ? userData.image : ''} />
-        <Box>
+        <Box pt="20px">
           <Heading size={isLowRes ? 'md' : 'xl'}>{userData.name}</Heading>
-          <Text>Likes: , Places:{userData.places.length}</Text>
+          <HStack mt={4} align={'left'}>
+            <FontAwesomeIcon
+              style={{ fontSize: '25px', color: '#ff4d4d' }}
+              icon={faHeart}
+            ></FontAwesomeIcon>
+            <Text>0{/* TODO IMPLEMENT LIKES */}</Text>
+
+            <FontAwesomeIcon
+              style={{ fontSize: '25px', color: '#82d1c6' }}
+              icon={faThumbtack}
+            ></FontAwesomeIcon>
+            <Text>{userData.places.length}</Text>
+          </HStack>
         </Box>
       </HStack>
 
@@ -116,21 +114,6 @@ const User = () => {
           </Link>
         )}
       </HStack>
-
-      <Box w="60%">
-        <Box ml="80%" display="inline-block">
-          <FontAwesomeIcon icon={faMapMarker} />
-        </Box>
-
-        <Box h="2px">
-          <Box
-            borderRadius="md"
-            bgColor={mainColor}
-            w={`${getYearPercentage()}%`}
-            h="100%"
-          ></Box>{' '}
-        </Box>
-      </Box>
 
       <Divider w="60%" />
       <Box textAlign={'center'}>

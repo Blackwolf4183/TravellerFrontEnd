@@ -7,7 +7,7 @@ const config = {
 
 const colors = {
     primary:"#565387",
-    primaryLight:"#7975bf",
+    primaryLight:"#948fe3",
     secondary:"rgba(103, 58, 217, 1)",
     footer:"#565387",
     footerLight:"#7975bf",

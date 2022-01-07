@@ -45,10 +45,13 @@ function App() {
         <Route path="/user/:uid" exact>
           <User />
         </Route>
-        <Route path="/auth">
-          <Auth />
+        <Route path="/auth/login">
+          <Auth isLoging={true}/>
         </Route>
-        <Redirect to="/auth" />
+        <Route path="/auth/signup">
+          <Auth isLoging={false}/>
+        </Route>
+        <Redirect to="/auth/login" />
       </Switch>
     );
   } else {

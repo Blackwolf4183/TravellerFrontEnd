@@ -1,11 +1,10 @@
-import { useState } from 'react';
 import { Center, Box, useColorModeValue } from '@chakra-ui/react';
 
 import Login from './components/Login';
 import Signup from './components/Signup';
 
-const Auth = ({}) => {
-  const [isLoging, setIsLoging] = useState(false);
+const Auth = ({isLoging}) => {
+
   const mainColor = useColorModeValue('primaryLight', 'primary');
   return (
     <Center mt="50px">
@@ -18,9 +17,9 @@ const Auth = ({}) => {
         borderRadius={'md'}
       >
         {isLoging ? (
-          <Login setIsLoging={setIsLoging} />
+          <Login />
         ) : (
-          <Signup setIsLoging={setIsLoging} />
+          <Signup/>
         )}
       </Box>
     </Center>

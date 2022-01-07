@@ -1,5 +1,6 @@
 import { useState, useContext } from 'react';
 import { Formik, Form, Field } from 'formik';
+import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import {
   FormControl,
@@ -17,8 +18,9 @@ import {
 } from '@chakra-ui/react';
 import { Authcontext } from '../../../shared/context/auth-context';
 
-const Login = ({ setIsLoging }) => {
+const Login = () => {
   const auth = useContext(Authcontext);
+  const history = useHistory();
 
   function emailValidator(value) {
     let error;
@@ -136,7 +138,7 @@ const Login = ({ setIsLoging }) => {
                     pb="15px"
                     cursor={'pointer'}
                     onClick={() => {
-                      setIsLoging(false);
+                      history.push("/auth/signup/")
                     }}
                   >
                     Don't have an account?
