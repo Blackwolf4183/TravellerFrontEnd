@@ -4,7 +4,7 @@ import { Center, Box, useColorModeValue } from '@chakra-ui/react';
 import Login from './components/Login';
 import Signup from './components/Signup';
 
-const Auth = () => {
+const Auth = ({}) => {
   const [isLoging, setIsLoging] = useState(false);
   const mainColor = useColorModeValue('primaryLight', 'primary');
   return (

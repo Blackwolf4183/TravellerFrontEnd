@@ -6,20 +6,30 @@ import {
   Badge,
   HStack,
   useDisclosure,
+  Text,
+  IconButton,
 } from '@chakra-ui/react';
 import React, { useContext } from 'react';
 import { useMediaQuery } from '@react-hook/media-query';
 import { useHistory } from 'react-router-dom';
 import { Authcontext } from '../context/auth-context';
+import { motion } from 'framer-motion';
 
 import DeleteModal from './DeleteModal';
+import ExpandedPlaceModal from './ExpandedPlaceModal';
+import imgPlaceHolder from '../../assets/imagePlaceholder.jpg';
 
-import imgPlaceHolder from '../../assets/imagePlaceholder.jpg'
+import { faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as emptyHeart}  from '@fortawesome/free-regular-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+const MotionBox = motion(Box);
 
 const PlaceCard = ({
   picture,
   likes,
   title,
+  description,
   city,
   country,
   mapsUrl,
@@ -28,18 +38,33 @@ const PlaceCard = ({
 }) => {
   const isLowRes = useMediaQuery('(max-width:680px)');
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const expandedPlaceDisclosure = useDisclosure();
   const auth = useContext(Authcontext);
   const history = useHistory();
 
   return (
     <>
-      <DeleteModal isOpen={isOpen} onClose={onClose}  placeId={placeId}/>
+      <DeleteModal isOpen={isOpen} onClose={onClose} placeId={placeId} />
+      <ExpandedPlaceModal
+        isOpen={expandedPlaceDisclosure.isOpen}
+        onClose={expandedPlaceDisclosure.onClose}
+        picture={picture ? picture : imgPlaceHolder}
+        likes={likes}
+        title={title}
+        description={description}
+        city={city}
+        country={country}
+        creatorId={creatorId}
+      />
       <WrapItem>
-        <Box
+        <MotionBox
           maxW={isLowRes ? '250px' : 'sm'}
           borderWidth="1px"
           borderRadius="lg"
           overflow="hidden"
+          whileHover={{ scale: 0.95 }}
+          whileTap={{ scale: 1 }}
+          onClick={expandedPlaceDisclosure.onOpen}
         >
           <Image src={picture ? picture : imgPlaceHolder} />
 
@@ -69,9 +94,23 @@ const PlaceCard = ({
             >
               {title}
             </Box>
-            <Box mt="1" as="h4" lineHeight="tight" isTruncated>
-              Likes:
-            </Box>
+            
+            <HStack mt="1" as="h4" lineHeight="tight" isTruncated>
+              {auth.isLoggedIn ?
+              <IconButton>
+              <FontAwesomeIcon
+                style={{ fontSize: '25px', color: '#ff4d4d' }}
+                icon={emptyHeart}
+              ></FontAwesomeIcon>
+              </IconButton>
+              :
+              <FontAwesomeIcon
+                style={{ fontSize: '25px', color: '#ff4d4d' }}
+                icon={faHeart}
+              ></FontAwesomeIcon>
+              }
+              <Text>{likes ? likes : 'Not found'}</Text>
+            </HStack>
 
             <HStack mt="2" as="h4" lineHeight="tight" isTruncated>
               <Button
@@ -83,25 +122,31 @@ const PlaceCard = ({
                 {isLowRes ? 'Map' : 'View on map'}
               </Button>
 
-              {(auth.isLoggedIn && creatorId === auth.userId) && 
-              <>
-                <Button colorScheme={'orange'} variant="outline" height="30px" onClick={() => {history.push("/places/" + placeId)}}>
-                  Edit
-                </Button>
-                <Button
-                  colorScheme={'red'}
-                  height="30px"
-                  variant="outline"
-                  onClick={onOpen}
-                >
-                  Delete
-                </Button>
-              </>
-              }
-              
+              {auth.isLoggedIn && creatorId === auth.userId && (
+                <>
+                  <Button
+                    colorScheme={'orange'}
+                    variant="outline"
+                    height="30px"
+                    onClick={() => {
+                      history.push('/places/' + placeId);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    colorScheme={'red'}
+                    height="30px"
+                    variant="outline"
+                    onClick={onOpen}
+                  >
+                    Delete
+                  </Button>
+                </>
+              )}
             </HStack>
           </Box>
-        </Box>
+        </MotionBox>
       </WrapItem>
     </>
   );

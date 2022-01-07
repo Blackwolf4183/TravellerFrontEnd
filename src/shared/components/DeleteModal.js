@@ -36,7 +36,7 @@ const DeleteModal = ({ isOpen, onClose, placeId }) => {
 
         <ModalFooter mt="20px">
           <Button colorScheme="orange" mr={3} onClick={onClose}>
-            Back up
+            Close
           </Button>
           <Button colorScheme="red" mr={3} onClick={handleDelete}>
             Delete
