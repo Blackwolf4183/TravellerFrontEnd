@@ -35,7 +35,7 @@ const UserCard = ({ id, name, image, likes, numPlaces }) => {
       >
         <Link to={`user/${id}`}>
           <Avatar
-            src={image}
+            src={image==="none" ? "" : "http://localhost:5000\\" + image}
             size="xl"
             borderColor={cardColor}
             borderWidth={'5px'}

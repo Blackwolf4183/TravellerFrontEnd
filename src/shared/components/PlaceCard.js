@@ -26,7 +26,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 const MotionBox = motion(Box);
 
 const PlaceCard = ({
-  picture,
+  image,
   likes,
   title,
   description,
@@ -50,13 +50,14 @@ const PlaceCard = ({
   const auth = useContext(Authcontext);
   const history = useHistory();
 
+
   return (
     <>
       <DeleteModal isOpen={isOpenDeleteModal} onClose={closeDeleteModal} placeId={placeId} />
       <ExpandedPlaceModal
         isOpen={isOpenExtendedModal}
         onClose={closeExtendedModal}
-        picture={picture ? picture : imgPlaceHolder}
+        image={image ? image : imgPlaceHolder}
         likes={likes}
         title={title}
         description={description}
@@ -74,7 +75,7 @@ const PlaceCard = ({
           whileTap={{ scale: 1 }}
         >
 
-          <Image onClick={openExtendedModal} draggable="false" src={picture ? picture : imgPlaceHolder} />
+          <Image onClick={openExtendedModal} draggable="false" src={image ? "http://localhost:5000\\" + image : imgPlaceHolder} />
 
           <Box p="6">
             <Box display="flex" alignItems="baseline">

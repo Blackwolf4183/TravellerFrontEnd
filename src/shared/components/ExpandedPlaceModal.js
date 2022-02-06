@@ -24,10 +24,12 @@ import { faHeart, faMapMarker } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 
+import imgPlaceHolder from '../../assets/imagePlaceholder.jpg';
+
 const ExpandedPlaceModal = ({
   onClose,
   isOpen,
-  picture,
+  image,
   likes,
   title,
   description,
@@ -60,7 +62,7 @@ const ExpandedPlaceModal = ({
         <ModalHeader mt={2}>{title.toUpperCase()}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Image draggable="false" src={picture} borderRadius={'md'} />
+          <Image draggable="false" src={image ? "http://localhost:5000\\" + image : imgPlaceHolder} borderRadius={'md'} alt="Place's picture"/>
 
           <HStack mt={8} spacing="10px" mb={4}>
             {isLoading ? (
@@ -76,7 +78,7 @@ const ExpandedPlaceModal = ({
                 onClick={() => history.push('user/' + creatorId)}
                 cursor={'pointer'}
               >
-                <Avatar src={userData.image} />
+                <Avatar src={userData.image==="none" ? "" : "http://localhost:5000\\" + userData.image} />
                 <Text fontSize={'lg'}>{userData.name}</Text>
               </HStack>
             )}

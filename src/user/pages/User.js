@@ -86,7 +86,7 @@ const User = () => {
   return (
     <VStack justify={'center'} mt="50px" spacing="50px" mb="100px">
       <HStack spacing="50px" w={isLowRes ? '80%' : '60%'}>
-        <Avatar size="xl" src={userData.image ? userData.image : ''} />
+        <Avatar size="xl" src={userData.image==="none" ? "" : "http://localhost:5000\\" + userData.image} />
         <Box pt="20px">
           <Heading size={isLowRes ? 'md' : 'xl'}>{userData.name}</Heading>
           <HStack mt={4} align={'left'}>

@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useState,useEffect,useRef } from 'react';
 import { Formik, Form, Field } from 'formik';
 import { useHistory } from 'react-router-dom';
 import { Authcontext } from '../shared/context/auth-context';
@@ -16,7 +16,14 @@ import {
   HStack,
   Button,
   Text,
+  InputGroup,
+  IconButton,
+  Image,
+  Box,
 } from '@chakra-ui/react';
+
+import { faFileImage } from '@fortawesome/free-regular-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const NewPlace = () => {
   const auth = useContext(Authcontext);
@@ -75,6 +82,38 @@ const NewPlace = () => {
     return error;
   }
 
+  //file picking logic
+
+  const filePickerRef = useRef();
+  const [file, setFile] = useState();
+  const [previewUrl, setPreviewUrl] = useState();
+  const [isImageValid, setisImageValid] = useState(false);
+
+  useEffect(() => {
+    if (!file) {
+      return;
+    }
+    const fileReader = new FileReader(); //let us generate urls for files
+    fileReader.onload = () => {
+      setPreviewUrl(fileReader.result);
+    };
+    fileReader.readAsDataURL(file);
+  }, [file]);
+
+  const pickedHandler = event => {
+    if (event.target.files || event.target.files.length === 1) {
+      const pickedFile = event.target.files[0]; //this is what we need to send to the server;
+      setFile(pickedFile);
+      setisImageValid(true);
+    } else {
+      setisImageValid(false);
+    }
+  };
+
+  const pickImageHandler = () => {
+    filePickerRef.current.click(); //will open files
+  };
+
   const [error, setError] = useState(null);
 
   return (
@@ -89,15 +128,28 @@ const NewPlace = () => {
       onSubmit={(values, actions) => {
         setTimeout(() => {
           //post request
+
+          if(!file){
+            setError("You must upload at least one picture");
+            actions.setSubmitting(false);
+            return;
+          }
+
+          let formData = new FormData();
+          formData.append('image', file);
+          formData.append('title',values.title);
+          formData.append('description',values.description);
+          formData.append('country',values.country);
+          formData.append('city',values.city);
+          formData.append('mapsUrl',values.mapsUrl);
+          formData.append('creatorId',auth.userId);
+
+          const config = {
+            headers: { 'content-type': 'multipart/form-data' },
+          };
+
           axios
-            .post('http://localhost:5000/api/places/', {
-              title: values.title,
-              description: values.description,
-              country: values.country,
-              city: values.city,
-              mapsUrl: values.mapsUrl,
-              creatorId: auth.userId,
-            })
+            .post('http://localhost:5000/api/places/',formData, config)
             .then(response => {
               actions.setSubmitting(false);
               /* console.log(response.data); */
@@ -241,6 +293,45 @@ const NewPlace = () => {
                       .
                     </FormHelperText>
                     <FormErrorMessage>{form.errors.mapsUrl}</FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
+
+              {/* FILE PICKER */}
+              <Field name="image">
+                {({ field, form }) => (
+                  <FormControl
+                    isInvalid={form.errors.image && form.touched.image}
+                  >
+                    <FormLabel htmlFor="image">Image</FormLabel>
+                    <InputGroup size="md">
+                      <Input
+                        {...field}
+                        w="0px"
+                        display={'none'}
+                        variant="flushed"
+                        type="file"
+                        accept=".jpg,.png,.jpeg"
+                        ref={filePickerRef}
+                        onChange={pickedHandler}
+                      />
+
+                      <IconButton onClick={pickImageHandler}>
+                        <FontAwesomeIcon
+                          style={{ fontSize: '25px' }}
+                          icon={faFileImage}
+                        ></FontAwesomeIcon>
+                      </IconButton>
+                    </InputGroup>
+                    <Center borderRadius={"sm"} borderWidth={"1px"} p="10px" mt="10px">
+                      <Box >
+                        <Text>{!previewUrl && "No Image provided"}</Text>
+                      <Image size="xl" src={previewUrl && previewUrl} />
+                      </Box>
+                    </Center>
+                    <FormErrorMessage>
+                      {!isImageValid && 'Image is not valid'}
+                    </FormErrorMessage>
                   </FormControl>
                 )}
               </Field>
