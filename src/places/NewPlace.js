@@ -151,7 +151,7 @@ const NewPlace = () => {
           };
 
           axios
-            .post('http://localhost:5000/api/places/', formData, config)
+            .post(process.env.REACT_APP_BACKEND_URL + '/places/', formData, config)
             .then(response => {
               actions.setSubmitting(false);
               /* console.log(response.data); */

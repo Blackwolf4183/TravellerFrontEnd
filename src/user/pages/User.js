@@ -41,7 +41,7 @@ const User = () => {
   useEffect(() => {
     //user data fetching
     axios
-      .get('http://localhost:5000/api/users/' + userId)
+      .get(process.env.REACT_APP_BACKEND_URL + '/users/' + userId)
       .then(response => {
         setUserData(response.data.user);
       })
@@ -53,7 +53,7 @@ const User = () => {
   useEffect(() => {
     //user places fetching
     axios
-      .get('http://localhost:5000/api/places/user/' + userId)
+      .get(process.env.REACT_APP_BACKEND_URL + '/places/user/' + userId)
       .then(response => {
         setUserPlaces(response.data.places);
       })
@@ -86,7 +86,7 @@ const User = () => {
   return (
     <VStack justify={'center'} mt="50px" spacing="50px" mb="100px">
       <HStack spacing="50px" w={isLowRes ? '80%' : '60%'}>
-        <Avatar size="xl" src={userData.image==="none" ? "" : "http://localhost:5000\\" + userData.image} />
+        <Avatar size="xl" src={userData.image==="none" ? "" : process.env.REACT_APP_ASSET_URL + userData.image} />
         <Box pt="20px">
           <Heading size={isLowRes ? 'md' : 'xl'}>{userData.name}</Heading>
           <HStack mt={4} align={'left'}>

@@ -49,9 +49,8 @@ const Login = () => {
       onSubmit={(values, actions) => {
         setTimeout(() => {
           const { mail, password } = values;
-
           axios
-            .post('http://localhost:5000/api/users/login/', {
+            .post(process.env.REACT_APP_BACKEND_URL + '/users/login/', {
               email: mail,
               password: password,
             })

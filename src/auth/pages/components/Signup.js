@@ -111,12 +111,12 @@ const Signup = () => {
           };
 
           axios
-            .post('http://localhost:5000/api/users/signup/', formData, config)
+            .post(process.env.REACT_APP_BACKEND_URL + '/users/signup/', formData, config)
             .then(response => {
-              //FIXME: 
+              console.log(response.data)
               const responseData = response.data;
               actions.setSubmitting(false);
-              auth.login(responseData.userId);
+              auth.login(responseData.userId,responseData.token);
             })
             .catch(error => {
               actions.setSubmitting(false);

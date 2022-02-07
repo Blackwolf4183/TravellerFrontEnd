@@ -27,7 +27,7 @@ const DeleteModal = ({ isOpen, onClose, placeId }) => {
       },
     };
 
-    axios.delete('http://localhost:5000/api/places/' + placeId,config).then(response => {
+    axios.delete(process.env.REACT_APP_BACKEND_URL + '/places/' + placeId,config).then(response => {
       /* console.log(response) */
       window.location.reload(); //to update page
     }).catch(error => {

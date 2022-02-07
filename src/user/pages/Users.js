@@ -25,7 +25,7 @@ const Users = () => {
   //Users fetching
   useEffect(() => {
     axios
-      .get('http://localhost:5000/api/users/')
+      .get(process.env.REACT_APP_BACKEND_URL + '/users/')
       .then(response => {
         const users = response.data.users;
         setUsers(users);

@@ -57,7 +57,7 @@ const UpdatePlace = () => {
 
     //user places fetching
     axios
-      .get('http://localhost:5000/api/places/' + placeId)
+      .get(process.env.REACT_APP_BACKEND_URL + '/places/' + placeId)
       .then(response => {
         setIdentifiedPlace(response.data.place);
         setIsLoading(false);
@@ -111,7 +111,7 @@ const UpdatePlace = () => {
           };
 
           axios
-            .patch('http://localhost:5000/api/places/' + placeId, {
+            .patch(process.env.REACT_APP_BACKEND_URL + '/places/' + placeId, {
               title: values.title,
               description: values.description,
             },config)

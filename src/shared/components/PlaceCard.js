@@ -75,7 +75,7 @@ const PlaceCard = ({
           whileTap={{ scale: 1 }}
         >
 
-          <Image onClick={openExtendedModal} draggable="false" src={image ? "http://localhost:5000\\" + image : imgPlaceHolder} />
+          <Image onClick={openExtendedModal} draggable="false" src={image ? process.env.REACT_APP_ASSET_URL + image : imgPlaceHolder} />
 
           <Box p="6">
             <Box display="flex" alignItems="baseline">

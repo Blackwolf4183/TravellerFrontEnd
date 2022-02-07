@@ -38,7 +38,7 @@ const Main = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:5000/api/main/')
+      .get(process.env.REACT_APP_BACKEND_URL + '/main/')
       .then(response => {
         setPlaces(response.data.places);
         setIsLoading(false);
