@@ -1,4 +1,4 @@
-import { useContext, useState,useEffect,useRef } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
 import { Formik, Form, Field } from 'formik';
 import { useHistory } from 'react-router-dom';
 import { Authcontext } from '../shared/context/auth-context';
@@ -129,27 +129,29 @@ const NewPlace = () => {
         setTimeout(() => {
           //post request
 
-          if(!file){
-            setError("You must upload at least one picture");
+          if (!file) {
+            setError('You must upload at least one picture');
             actions.setSubmitting(false);
             return;
           }
 
           let formData = new FormData();
           formData.append('image', file);
-          formData.append('title',values.title);
-          formData.append('description',values.description);
-          formData.append('country',values.country);
-          formData.append('city',values.city);
-          formData.append('mapsUrl',values.mapsUrl);
-          formData.append('creatorId',auth.userId);
+          formData.append('title', values.title);
+          formData.append('description', values.description);
+          formData.append('country', values.country);
+          formData.append('city', values.city);
+          formData.append('mapsUrl', values.mapsUrl);
 
           const config = {
-            headers: { 'content-type': 'multipart/form-data' },
+            headers: {
+              'content-type': 'multipart/form-data',
+              Authorization: 'Bearer ' + auth.token,
+            },
           };
 
           axios
-            .post('http://localhost:5000/api/places/',formData, config)
+            .post('http://localhost:5000/api/places/', formData, config)
             .then(response => {
               actions.setSubmitting(false);
               /* console.log(response.data); */
@@ -323,10 +325,15 @@ const NewPlace = () => {
                         ></FontAwesomeIcon>
                       </IconButton>
                     </InputGroup>
-                    <Center borderRadius={"sm"} borderWidth={"1px"} p="10px" mt="10px">
-                      <Box >
-                        <Text>{!previewUrl && "No Image provided"}</Text>
-                      <Image size="xl" src={previewUrl && previewUrl} />
+                    <Center
+                      borderRadius={'sm'}
+                      borderWidth={'1px'}
+                      p="10px"
+                      mt="10px"
+                    >
+                      <Box>
+                        <Text>{!previewUrl && 'No Image provided'}</Text>
+                        <Image size="xl" src={previewUrl && previewUrl} />
                       </Box>
                     </Center>
                     <FormErrorMessage>

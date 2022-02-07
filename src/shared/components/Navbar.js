@@ -56,7 +56,7 @@ const Navbar = () => {
         {auth.isLoggedIn && (
           <>
             <Heading fontSize="lg" lineHeight={'30px'}>
-              <NavLink to={"/user/" + auth.userId}>Profile</NavLink>
+              <NavLink to={"/user/" + auth.userId}>Profile</NavLink> {/* FIXME: not showing userId  */}
             </Heading>
             <Heading fontSize="lg" lineHeight={'30px'}>
               <NavLink to="/places/new">Add Place</NavLink>

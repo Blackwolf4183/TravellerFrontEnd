@@ -59,7 +59,7 @@ const Login = () => {
               /* console.log(response.data); */
               const responseData = response.data
               actions.setSubmitting(false);
-              auth.login(responseData.user.id);
+              auth.login(responseData.userId,responseData.token);
             })
             .catch(error => {
               actions.setSubmitting(false);

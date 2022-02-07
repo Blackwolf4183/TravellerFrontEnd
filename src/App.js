@@ -1,5 +1,5 @@
 import './App.css';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Route,
@@ -19,21 +19,44 @@ import UpdatePlace from './places/pages/UpdatePlace';
 import Auth from './auth/pages/Auth';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [token, setToken] = useState(null);
   const [userId, setUserId] = useState(null);
 
-  const login = useCallback((uid) => {
-    setIsLoggedIn(true);
+  const login = useCallback((uid, token, expirationDate) => {
+    setToken(token);
+    const toeknExpirationDate =
+      expirationDate || new Date(new Date().getTime() + 1000 * 60 * 60); //new date + 1 hour
+    localStorage.setItem(
+      'userData',
+      JSON.stringify({
+        userId: uid,
+        token: token,
+        expiration: toeknExpirationDate.toISOString(),
+      })
+    );
     setUserId(uid);
   }, []);
 
   const logout = useCallback(() => {
-    setIsLoggedIn(false);
+    setToken(null);
     setUserId(null);
+    localStorage.removeItem('userData'); // on logout
   }, []);
 
+  useEffect(() => {
+    //get token stored in localstorage
+    const storedData = JSON.parse(localStorage.getItem('userData'));
+    if (
+      storedData &&
+      storedData.token &&
+      new Date(storedData.expiration) > new Date()
+    ) {
+      login(storedData.userId, storedData.token, new Date(storedData.expiration));
+    }
+  }, [login]);
+
   let routes;
-  if (!isLoggedIn) {
+  if (!token) {
     routes = (
       <Switch>
         <Route path="/" exact>
@@ -46,10 +69,10 @@ function App() {
           <User />
         </Route>
         <Route path="/auth/login">
-          <Auth isLoging={true}/>
+          <Auth isLoging={true} />
         </Route>
         <Route path="/auth/signup">
-          <Auth isLoging={false}/>
+          <Auth isLoging={false} />
         </Route>
         <Redirect to="/auth/login" />
       </Switch>
@@ -80,8 +103,9 @@ function App() {
   return (
     <Authcontext.Provider
       value={{
-        isLoggedIn: isLoggedIn,
-        userId:userId,
+        isLoggedIn: !!token, //this will be true if there is a token
+        token: token,
+        userId: userId,
         login: login,
         logout: logout,
       }}

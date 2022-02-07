@@ -10,12 +10,24 @@ import {
   Button,
   Text,
 } from '@chakra-ui/react';
+import { Authcontext } from '../context/auth-context';
+import { useContext } from 'react';
 import axios from 'axios';
 
 const DeleteModal = ({ isOpen, onClose, placeId }) => {
+
+  const auth = useContext(Authcontext);
+  
   const handleDelete = () => {
     onClose();
-    axios.delete('http://localhost:5000/api/places/' + placeId).then(response => {
+
+    const config = {
+      headers: {
+        Authorization: 'Bearer ' + auth.token,
+      },
+    };
+
+    axios.delete('http://localhost:5000/api/places/' + placeId,config).then(response => {
       /* console.log(response) */
       window.location.reload(); //to update page
     }).catch(error => {

@@ -52,9 +52,9 @@ const UpdatePlace = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [updateError,setUpdateError] = useState(null);
 
-  //TODO: check if place to update, actually belongs to user/*  */
 
   useEffect(() => {
+
     //user places fetching
     axios
       .get('http://localhost:5000/api/places/' + placeId)
@@ -103,11 +103,18 @@ const UpdatePlace = () => {
       }}
       onSubmit={(values, actions) => {
         setTimeout(() => {
+
+          const config = {
+            headers: {
+              Authorization: 'Bearer ' + auth.token,
+            },
+          };
+
           axios
             .patch('http://localhost:5000/api/places/' + placeId, {
               title: values.title,
               description: values.description,
-            })
+            },config)
             .then(response => {
               actions.setSubmitting(false);
               history.push('/user/' + auth.userId);

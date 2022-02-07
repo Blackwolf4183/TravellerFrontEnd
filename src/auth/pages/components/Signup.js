@@ -113,9 +113,10 @@ const Signup = () => {
           axios
             .post('http://localhost:5000/api/users/signup/', formData, config)
             .then(response => {
+              //FIXME: 
               const responseData = response.data;
               actions.setSubmitting(false);
-              auth.login(responseData.user.id);
+              auth.login(responseData.userId);
             })
             .catch(error => {
               actions.setSubmitting(false);
